@@ -79,6 +79,15 @@ def smart_resize(
     return h_bar, w_bar
 
 
+def to_rgb(pil_image: Image.Image) -> Image.Image:
+      if pil_image.mode == 'RGBA':
+          white_background = Image.new("RGB", pil_image.size, (255, 255, 255))
+          white_background.paste(pil_image, mask=pil_image.split()[3])  # Use alpha channel as mask
+          return white_background
+      else:
+          return pil_image.convert("RGB")
+
+
 def fetch_image(ele: dict[str, str | Image.Image], size_factor: int = IMAGE_FACTOR) -> Image.Image:
     if "image" in ele:
         image = ele["image"]
@@ -100,7 +109,7 @@ def fetch_image(ele: dict[str, str | Image.Image], size_factor: int = IMAGE_FACT
         image_obj = Image.open(image)
     if image_obj is None:
         raise ValueError(f"Unrecognized image input, support local path, http url, base64 and PIL.Image, got {image}")
-    image = image_obj.convert("RGB")
+    image = to_rgb(image)
     ## resize
     if "resized_height" in ele and "resized_width" in ele:
         resized_height, resized_width = smart_resize(

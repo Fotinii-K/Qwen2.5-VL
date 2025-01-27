@@ -6,7 +6,7 @@
 <p>
 
 <p align="center">
-        💜 <a href="https://chat.qwenlm.ai/"><b>Qwen Chat</b></a>&nbsp&nbsp | &nbsp&nbsp🤗 <a href="https://huggingface.co/collections/Qwen/qwen2-vl-66cee7455501d7126940800d">Hugging Face</a>&nbsp&nbsp | &nbsp&nbsp🤖 <a href="https://modelscope.cn/organization/qwen">ModelScope</a>&nbsp&nbsp | &nbsp&nbsp 📑 <a href="https://qwenlm.github.io/blog/qwen2.5-vl/">Blog</a> &nbsp&nbsp| &nbsp&nbsp 📑Paper(is
+        💜 <a href="https://chat.qwenlm.ai/"><b>Qwen Chat</b></a>&nbsp&nbsp | &nbsp&nbsp🤗 <a href="https://huggingface.co/collections/Qwen/qwen25-vl-6795ffac22b334a837c0f9a5">Hugging Face</a>&nbsp&nbsp | &nbsp&nbsp🤖 <a href="https://modelscope.cn/organization/qwen">ModelScope</a>&nbsp&nbsp | &nbsp&nbsp 📑 <a href="https://qwenlm.github.io/blog/qwen2.5-vl/">Blog</a> &nbsp&nbsp| &nbsp&nbsp 📑Paper(is
           coming)</a> &nbsp&nbsp  </a>
 <br>
 🖥️ <a href="https://huggingface.co/spaces/Qwen/Qwen2.5-VL">Demo</a>&nbsp&nbsp | &nbsp&nbsp💬 <a href="https://github.com/QwenLM/Qwen/blob/main/assets/wechat.png">WeChat (微信)</a>&nbsp&nbsp | &nbsp&nbsp🫨 <a href="https://discord.gg/CV4E9rpNSD">Discord</a>&nbsp&nbsp | &nbsp&nbsp<a href="https://help.aliyun.com/zh/model-studio/developer-reference/qwen-vl-api"> 📑 API</a>&nbsp&nbsp | &nbsp&nbsp🖥️ <a href="https://gallery.pai-ml.com/#/preview/deepLearning/cv/qwen2.5-vl">PAI-DSW</a>&nbsp&nbsp
@@ -57,7 +57,7 @@ We enhance both training and inference speeds by strategically implementing wind
 
 
 
-| Dataset            | Qwen2.5-VL-3B     | Qwen2.5-VL-7B    | Qwen2.5-VL 72B | Gemini-2 Flash | GPT-4o | Claude3.5 Sonnet | Qwen2-VL 72B | 
+| Dataset            | Qwen2.5-VL-3B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-3B-Instruct))     | Qwen2.5-VL-7B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-7B-Instruct))    | Qwen2.5-VL-72B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-72B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-72B-Instruct)) | Gemini-2 Flash | GPT-4o | Claude3.5 Sonnet | Qwen2-VL 72B | 
 |--------------------|--------|--------|----------------|----------------|--------|------------------|--------------|
 | MMMU               | 53.1  | 58.6 |**70.2**           | **70.7**           | 70.3   | 70.4             | 64.5         | 
 | MMMU Pro           | 31.6  | 38.3 |**51.1**           | **57**             | 54.5   | 54.7             | 46.2         | 

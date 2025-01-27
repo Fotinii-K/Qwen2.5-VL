@@ -91,7 +91,7 @@ Below, we provide simple examples to show how to use Qwen2.5-VL with 🤖 ModelS
 
 The code of Qwen2.5-VL has been in the latest Hugging face transformers and we advise you to build from source with command:
 ```
-pip install git+https://github.com/huggingface/transformer accelerate
+pip install git+https://github.com/huggingface/transformers accelerate
 ```
 or you might encounter the following error:
 ```
@@ -103,7 +103,7 @@ We offer a toolkit to help you handle various types of visual input more conveni
 
 ```bash
 # It's highly recommanded to use `[decord]` feature for faster video loading.
-pip install qwen-vl-utils[decord]
+pip install qwen-vl-utils[decord]==0.0.8
 ```
 
 If you are not using Linux, you might not be able to install `decord` from PyPI. In that case, you can use `pip install qwen-vl-utils` which will fall back to using torchvision for video processing. However, you can still [install decord from source](https://github.com/dmlc/decord?tab=readme-ov-file#install-from-source) to get decord used when loading video.

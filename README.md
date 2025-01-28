@@ -108,7 +108,7 @@ pip install qwen-vl-utils[decord]
 
 If you are not using Linux, you might not be able to install `decord` from PyPI. In that case, you can use `pip install qwen-vl-utils` which will fall back to using torchvision for video processing. However, you can still [install decord from source](https://github.com/dmlc/decord?tab=readme-ov-file#install-from-source) to get decord used when loading video.
 
-We are preparing cookbooks for many capabilities, including recognition, localization, document parsing, video understanding, key information extraction, and more. Welcome to learn more!
+We are preparing [cookbooks](https://github.com/QwenLM/Qwen2.5-VL/tree/main/cookbooks) for many capabilities, including recognition, localization, document parsing, video understanding, key information extraction, and more. Welcome to learn more!
 
 ### Using 🤗  Transformers to Chat
 

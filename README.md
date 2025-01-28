@@ -103,7 +103,7 @@ We offer a toolkit to help you handle various types of visual input more conveni
 
 ```bash
 # It's highly recommanded to use `[decord]` feature for faster video loading.
-pip install qwen-vl-utils[decord]==0.0.8
+pip install qwen-vl-utils[decord]
 ```
 
 If you are not using Linux, you might not be able to install `decord` from PyPI. In that case, you can use `pip install qwen-vl-utils` which will fall back to using torchvision for video processing. However, you can still [install decord from source](https://github.com/dmlc/decord?tab=readme-ov-file#install-from-source) to get decord used when loading video.

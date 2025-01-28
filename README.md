@@ -573,8 +573,8 @@ messages = [{
         },
     ]
 }]
-# The model name 'qwen-vl-max-0809' is the identity of 'Qwen2-VL-72B'.
-response = dashscope.MultiModalConversation.call(model='qwen-vl-max-0809', messages=messages)
+
+response = dashscope.MultiModalConversation.call(model='qwen2.5-vl-72b-instruct', messages=messages)
 print(response)
 ```
 

@@ -115,7 +115,7 @@ We are preparing [cookbooks](https://github.com/QwenLM/Qwen2.5-VL/tree/main/cook
 Here we show a code snippet to show you how to use the chat model with `transformers` and `qwen_vl_utils`:
 
 ```python
-from transformers import Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
+from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
 from qwen_vl_utils import process_vision_info
 
 # default: Load the model on the available device(s)
@@ -165,7 +165,7 @@ inputs = processor(
     padding=True,
     return_tensors="pt",
 )
-inputs = inputs.to("cuda")
+inputs = inputs.to(model.device)
 
 # Inference: Generation of the output
 generated_ids = model.generate(**inputs, max_new_tokens=128)

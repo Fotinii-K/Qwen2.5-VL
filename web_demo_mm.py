@@ -11,9 +11,9 @@ from threading import Thread
 import gradio as gr
 import torch
 from qwen_vl_utils import process_vision_info
-from transformers import AutoProcessor, Qwen2VLForConditionalGeneration, TextIteratorStreamer
+from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration, TextIteratorStreamer
 
-DEFAULT_CKPT_PATH = 'Qwen/Qwen2-VL-7B-Instruct'
+DEFAULT_CKPT_PATH = 'Qwen/Qwen2.5-VL-7B-Instruct'
 
 
 def _get_args():
@@ -53,12 +53,12 @@ def _load_model_processor(args):
 
     # Check if flash-attn2 flag is enabled and load model accordingly
     if args.flash_attn2:
-        model = Qwen2VLForConditionalGeneration.from_pretrained(args.checkpoint_path,
+        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(args.checkpoint_path,
                                                                 torch_dtype='auto',
                                                                 attn_implementation='flash_attention_2',
                                                                 device_map=device_map)
     else:
-        model = Qwen2VLForConditionalGeneration.from_pretrained(args.checkpoint_path, device_map=device_map)
+        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(args.checkpoint_path, device_map=device_map)
 
     processor = AutoProcessor.from_pretrained(args.checkpoint_path)
     return model, processor

@@ -656,13 +656,190 @@ python app.py
 This demo supports webcam/screen capture as its video input source. To support screen capture video input, we use code snippet from the following hugginface space: [gstaff/gradio-screen-recorder](https://huggingface.co/spaces/gstaff/gradio-screen-recorder/tree/main).
 
 
+## Deployment
+
+We recommend using vLLM for fast Qwen2.5-VL deployment and inference. You need to use the latest version of vllm to enable Qwen2.5-VL support. You can also use our [official docker image](#-docker).
+
+You can also check [vLLM official documentation](https://docs.vllm.ai/en/latest/serving/multimodal_inputs.html) for more details about online serving and offline inference.
+
+### Installation
+```bash
+pip install git+https://github.com/huggingface/transformers@f3f6c86582611976e72be054675e2bf0abb5f775
+pip install accelerate
+pip install qwen-vl-utils
+pip install vllm --pre --extra-index-url https://wheels.vllm.ai/nightly
+
+```
+### Start an OpenAI API Service
+
+Run the command below to start an OpenAI-compatible API service:
+
+```bash
+vllm serve Qwen/Qwen2.5-VL-7B-Instruct --port 8000 --host 0.0.0.0 --dtype bfloat16 --limit-mm-per-prompt image=5,video=5
+```
+
+Then you can use the chat API as below (via curl or Python API):
+
+```bash
+curl http://localhost:8000/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+    "model": "Qwen2.5-VL-7B-Instruct",
+    "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": [
+        {"type": "image_url", "image_url": {"url": "https://modelscope.oss-cn-beijing.aliyuncs.com/resource/qwen.png"}},
+        {"type": "text", "text": "What is the text in the illustrate?"}
+    ]}
+    ]
+    }'
+```
+
+```python
+from openai import OpenAI
+
+# Set OpenAI's API key and API base to use vLLM's API server.
+openai_api_key = "EMPTY"
+openai_api_base = "http://localhost:8000/v1"
+
+client = OpenAI(
+    api_key=openai_api_key,
+    base_url=openai_api_base,
+)
+
+chat_response = client.chat.completions.create(
+    model="Qwen2.5-VL-7B-Instruct",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://modelscope.oss-cn-beijing.aliyuncs.com/resource/qwen.png"
+                    },
+                },
+                {"type": "text", "text": "What is the text in the illustrate?"},
+            ],
+        },
+    ],
+)
+print("Chat response:", chat_response)
+```
+
+You can also upload base64-encoded local images (see [OpenAI API protocol document](https://platform.openai.com/docs/guides/vision/uploading-base-64-encoded-images) for more details):
+```python
+import base64
+from openai import OpenAI
+# Set OpenAI's API key and API base to use vLLM's API server.
+openai_api_key = "EMPTY"
+openai_api_base = "http://localhost:8000/v1"
+client = OpenAI(
+    api_key=openai_api_key,
+    base_url=openai_api_base,
+)
+image_path = "/path/to/local/image.png"
+with open(image_path, "rb") as f:
+    encoded_image = base64.b64encode(f.read())
+encoded_image_text = encoded_image.decode("utf-8")
+base64_qwen = f"data:image;base64,{encoded_image_text}"
+chat_response = client.chat.completions.create(
+    model="Qwen2.5-VL-7B-Instruct",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": base64_qwen
+                    },
+                },
+                {"type": "text", "text": "What is the text in the illustrate?"},
+            ],
+        },
+    ],
+)
+print("Chat response:", chat_response)
+```
+
+### Inference Locally
+
+You can also use vLLM to inference Qwen2.5-VL locally:
+
+```python
+from transformers import AutoProcessor
+from vllm import LLM, SamplingParams
+from qwen_vl_utils import process_vision_info
+
+MODEL_PATH = "Qwen/Qwen2.5-VL-7B-Instruct"
+
+llm = LLM(
+    model=MODEL_PATH,
+    limit_mm_per_prompt={"image": 10, "video": 10},
+)
+
+sampling_params = SamplingParams(
+    temperature=0.1,
+    top_p=0.001,
+    repetition_penalty=1.05,
+    max_tokens=256,
+    stop_token_ids=[],
+)
+
+messages = [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "image",
+                "image": "https://modelscope.oss-cn-beijing.aliyuncs.com/resource/qwen.png",
+                "min_pixels": 224 * 224,
+                "max_pixels": 1280 * 28 * 28,
+            },
+            {"type": "text", "text": "What is the text in the illustrate?"},
+        ],
+    },
+]
+# For video input, you can pass following values instead:
+# "type": "video",
+# "video": "<video URL>",
+
+processor = AutoProcessor.from_pretrained(MODEL_PATH)
+prompt = processor.apply_chat_template(
+    messages,
+    tokenize=False,
+    add_generation_prompt=True,
+)
+image_inputs, video_inputs = process_vision_info(messages)
+
+mm_data = {}
+if image_inputs is not None:
+    mm_data["image"] = image_inputs
+if video_inputs is not None:
+    mm_data["video"] = video_inputs
+
+llm_inputs = {
+    "prompt": prompt,
+    "multi_modal_data": mm_data,
+}
+
+outputs = llm.generate([llm_inputs], sampling_params=sampling_params)
+generated_text = outputs[0].outputs[0].text
+
+print(generated_text)
+```
+
 
 ## 🐳 Docker
 
 To simplify the deploy process, we provide docker images with pre-build environments: [qwenllm/qwenvl](https://hub.docker.com/r/qwenllm/qwenvl). You only need to install the driver and download model files to launch demos.
 
 ```bash
-docker run --gpus all --ipc=host --network=host --rm --name qwen2 -it qwenllm/qwenvl:2-cu121 bash
+docker run --gpus all --ipc=host --network=host --rm --name qwen2.5 -it qwenllm/qwenvl:2.5-cu121 bash
 ```
 
 ## Citation

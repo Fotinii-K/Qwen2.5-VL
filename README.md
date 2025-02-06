@@ -814,7 +814,7 @@ prompt = processor.apply_chat_template(
     tokenize=False,
     add_generation_prompt=True,
 )
-image_inputs, video_inputs = process_vision_info(messages)
+image_inputs, video_inputs, video_kwargs = process_vision_info(messages, return_video_kwargs=True)
 
 mm_data = {}
 if image_inputs is not None:
@@ -825,6 +825,9 @@ if video_inputs is not None:
 llm_inputs = {
     "prompt": prompt,
     "multi_modal_data": mm_data,
+
+    # FPS will be returned in video_kwargs
+    "mm_processor_kwargs": video_kwargs,
 }
 
 outputs = llm.generate([llm_inputs], sampling_params=sampling_params)

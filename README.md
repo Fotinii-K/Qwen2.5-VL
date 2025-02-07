@@ -658,7 +658,7 @@ This demo supports webcam/screen capture as its video input source. To support s
 
 ## Deployment
 
-We recommend using vLLM for fast Qwen2.5-VL deployment and inference. You need to use the latest version of vllm to enable Qwen2.5-VL support. You can also use our [official docker image](#-docker).
+We recommend using vLLM for fast Qwen2.5-VL deployment and inference. You need to install `vllm>=0.7.2` to enable Qwen2.5-VL support. You can also use our [official docker image](#-docker).
 
 You can also check [vLLM official documentation](https://docs.vllm.ai/en/latest/serving/multimodal_inputs.html) for more details about online serving and offline inference.
 
@@ -667,7 +667,7 @@ You can also check [vLLM official documentation](https://docs.vllm.ai/en/latest/
 pip install git+https://github.com/huggingface/transformers@f3f6c86582611976e72be054675e2bf0abb5f775
 pip install accelerate
 pip install qwen-vl-utils
-pip install vllm --pre --extra-index-url https://wheels.vllm.ai/nightly
+pip install 'vllm>=0.7.2'
 
 ```
 ### Start an OpenAI API Service

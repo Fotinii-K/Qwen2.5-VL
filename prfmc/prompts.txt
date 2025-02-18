@@ -1,0 +1,54 @@
+Prompt: 
+
+You will receive a series of images representing a household task. 
+You need to determine and organize these, to the correct chronological order (e.g., 2, 1, 3) 
+based on the progression and changes depicted in the images.
+
+
+
+
+If the task is deemed incomplete, guide the robot to achieve the desired new position by adjusting 
+the motion vector [x, y, z, theta_x, theta_y, theta_z]. Each component controls movement or 
+rotation: x, y, z values of 1 move in the positive direction, -1 in the negative. 
+Similarly, theta_x, theta_y, theta_z values of 1 rotate counterclockwise, while -1 rotates clockwise. 
+The model must determine and update this vector to direct the robot efficiently toward its goal.
+
+Or
+
+Actions and their corresponding annotations are defined in the following list:
+
+navigate to(arg1): Navigate to the arg1, which can be a object or a room. If it’s a object, 
+you should get to a place where arg1 is reachable for the robot. 
+
+grasp(arg1): Grasp arg1. Preconditions: arg1 is within reachable distance and no object is currently held. 
+Postconditions: arg1 is being held. 
+
+place onTop(arg1, arg2): Place arg1 on top of arg2. Preconditions: arg1 is currently being held, 
+and arg2 is reachable. Postconditions: arg1 is put on top of arg2.
+
+place inside(arg1, arg2): Place arg1 inside of arg2. Preconditions: arg1 is currently being held,
+and arg2 is reachable. Postconditions:arg1 is put inside of arg2. 
+
+place under(arg1, arg2): Place arg1 under arg2. Preconditions: arg1 is currently being held, and 
+arg2 is reachable. Postconditions: arg1 is put under arg2. 
+
+place onLeft(arg1, arg2): Place arg1 on left of arg2. Preconditions: arg1 is currently being held, 
+and arg2 is reachable . Postconditions: arg1 is put on left of arg2. 
+
+place onRight(arg1, arg2): Place arg1 on right of arg2. Preconditions: arg1 is currently being held, 
+and arg2 is reachable. Postconditions: arg1 is put on right of arg2. 
+
+open(arg1): Open arg1. Preconditions: Arg1 is closed, and arg1 is reachable. Postconditions: Arg1 is open. 
+
+close(arg1): Close arg1. Preconditions: Arg1 is open, and arg1 is reachable. Postconditions: Arg1 is closed. 
+
+slice(arg1): Slice arg1, the item needs to be placed on the countertop. Preconditions: Arg1 is not sliced, 
+and arg1 is reachable. Postconditions: Arg1 is sliced. 
+
+wipe(arg1, arg2): Wipe across the surface of arg2 with arg1. Preconditions: Arg1 is currently being held, 
+and arg2 is reachable. Postconditions: Arg1 continues to be held, arg2 holds state unchanged. 
+
+wait(arg1): Wait for arg1 seconds. Preconditions: None. Postconditions: arg1 second(s) has(have) passed. 
+
+toggle(arg1): Press the button of arg1 to turn it on or off, Preconditions: Arg1 is open or closed, and 
+arg1 is reachable. Postconditions: Arg1 is closed or open.

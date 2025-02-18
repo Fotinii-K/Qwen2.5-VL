@@ -1,0 +1,8 @@
+git status
+
+
+git add .  or git add git_commands.txt
+git commit -m "first commit"
+git push origin master
+
+git branch 

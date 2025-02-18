@@ -778,7 +778,7 @@ from qwen_vl_utils import process_vision_info
 
 # Set OpenAI's API key and API base to use vLLM's API server.
 openai_api_key = "EMPTY"
-openai_api_base = "http://localhost:8899/v1"
+openai_api_base = "http://localhost:8000/v1"
 
 client = OpenAI(
     api_key=openai_api_key,

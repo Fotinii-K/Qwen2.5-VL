@@ -684,7 +684,7 @@ Then you can use the chat API as below (via curl or Python API):
 curl http://localhost:8000/v1/chat/completions \
     -H "Content-Type: application/json" \
     -d '{
-    "model": "Qwen2.5-VL-7B-Instruct",
+    "model": "Qwen/Qwen2.5-VL-7B-Instruct",
     "messages": [
     {"role": "system", "content": "You are a helpful assistant."},
     {"role": "user", "content": [
@@ -708,7 +708,7 @@ client = OpenAI(
 )
 
 chat_response = client.chat.completions.create(
-    model="Qwen2.5-VL-7B-Instruct",
+    model="Qwen/Qwen2.5-VL-7B-Instruct",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {
@@ -745,7 +745,7 @@ with open(image_path, "rb") as f:
 encoded_image_text = encoded_image.decode("utf-8")
 base64_qwen = f"data:image;base64,{encoded_image_text}"
 chat_response = client.chat.completions.create(
-    model="Qwen2.5-VL-7B-Instruct",
+    model="Qwen/Qwen2.5-VL-7B-Instruct",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {
@@ -761,6 +761,92 @@ chat_response = client.chat.completions.create(
             ],
         },
     ],
+)
+print("Chat response:", chat_response)
+```
+
+For videos, you can use the chat API  as follows：
+```python
+import base64
+import numpy as np
+
+from PIL import Image
+from io import BytesIO
+from openai import OpenAI
+from qwen_vl_utils import process_vision_info
+
+
+# Set OpenAI's API key and API base to use vLLM's API server.
+openai_api_key = "EMPTY"
+openai_api_base = "http://localhost:8000/v1"
+
+client = OpenAI(
+    api_key=openai_api_key,
+    base_url=openai_api_base,
+)
+
+
+video_messages = [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": [
+        {"type": "text", "text": "请用表格总结一下视频中的商品特点"},
+        {
+            "type": "video",
+            "video": "https://duguang-labelling.oss-cn-shanghai.aliyuncs.com/qiansun/video_ocr/videos/50221078283.mp4",
+            "total_pixels": 20480 * 28 * 28, "min_pixels": 16 * 28 * 2
+        }]
+    },
+]
+
+
+def prepare_message_for_vllm(content_messages):
+    """
+    The frame extraction logic of video inside vLLM is different from that of qwen_vl_utils.
+    Here we `use qwen_vl_utils` to extract video frames, and the `media_type` of video is set to `video/jpeg`;
+    Note: Currently vLLM online inference does not support passing `fps` parameters through `mm_processor_kwargs`,
+    so the default value 2.0 is used in  this function;
+    We will fix this problem later, see: https://github.com/vllm-project/vllm/issues/11652
+    """
+    vllm_messages = []
+    for message in content_messages:
+        message_content_list = message["content"]
+        if not isinstance(message_content_list, list):
+            vllm_messages.append(message)
+            continue
+
+        new_content_list = []
+        for part_message in message_content_list:
+            if 'video' in part_message:
+                video_message = [{'content': [part_message]}]
+                image_inputs, video_inputs, video_kwargs = process_vision_info(video_message, return_video_kwargs=True)
+                assert video_inputs is not None, "video_inputs should not be None"
+                video_input = (video_inputs.pop()).permute(0, 2, 3, 1).numpy().astype(np.uint8)
+                print("video_kwargs", video_kwargs, video_input.shape)
+
+                # encode image with base64
+                base64_frames = []
+                for frame in video_input:
+                    img = Image.fromarray(frame)
+                    output_buffer = BytesIO()
+                    img.save(output_buffer, format="jpeg")
+                    byte_data = output_buffer.getvalue()
+                    base64_str = base64.b64encode(byte_data).decode("utf-8")
+                    base64_frames.append(base64_str)
+
+                part_message = {
+                    "type": "video_url",
+                    "video_url": {"url": f"data:video/jpeg;base64,{','.join(base64_frames)}"}
+                }
+            new_content_list.append(part_message)
+        message["content"] = new_content_list
+        vllm_messages.append(message)
+    return vllm_messages
+
+
+video_messages = prepare_message_for_vllm(video_messages)
+chat_response = client.chat.completions.create(
+    model="Qwen/Qwen2.5-VL-7B-Instruct",
+    messages=video_messages
 )
 print("Chat response:", chat_response)
 ```
@@ -789,7 +875,7 @@ sampling_params = SamplingParams(
     stop_token_ids=[],
 )
 
-messages = [
+image_messages = [
     {"role": "system", "content": "You are a helpful assistant."},
     {
         "role": "user",
@@ -804,9 +890,26 @@ messages = [
         ],
     },
 ]
+
+
 # For video input, you can pass following values instead:
 # "type": "video",
 # "video": "<video URL>",
+video_messages = [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": [
+            {"type": "text", "text": "请用表格总结一下视频中的商品特点"},
+            {
+                "type": "video", 
+                "video": "https://duguang-labelling.oss-cn-shanghai.aliyuncs.com/qiansun/video_ocr/videos/50221078283.mp4",
+                "total_pixels": 20480 * 28 * 28, "min_pixels": 16 * 28 * 28
+            }
+        ]
+    },
+]
+
+# Here we use video messages as a demonstration
+messages = video_messages
 
 processor = AutoProcessor.from_pretrained(MODEL_PATH)
 prompt = processor.apply_chat_template(

@@ -80,7 +80,7 @@ for frame in frame_array:
     if "bounding box" in prompt.lower() or "outline" in prompt.lower():
         # Process bounding box request
         print(f"Processing bounding box request for image: {frame}")
-        frame = np.array(frame).astype(np.uint8)
+        frame = Image.fromarray(np.array(frame).astype(np.uint8))
         bbox_response = bounding_box_request(frame, prompt)
         print("Bounding Box Coordinates (JSON):")
         print(bbox_response)
@@ -108,6 +108,7 @@ for frame in frame_array:
         output_text = processor.batch_decode(generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
         print(f"Response for image: {frame}")
         print(output_text[0])
+
 
 
 # Process vision inputs

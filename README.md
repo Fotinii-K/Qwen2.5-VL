@@ -658,7 +658,7 @@ This demo supports webcam/screen capture as its video input source. To support s
 
 ## Deployment
 
-We recommend using vLLM for fast Qwen2.5-VL deployment and inference. You need to install `vllm>=0.7.2` to enable Qwen2.5-VL support. You can also use our [official docker image](#-docker).
+We recommend using vLLM for fast Qwen2.5-VL deployment and inference. You need to install `vllm>0.7.2` to enable Qwen2.5-VL support. You can also use our [official docker image](#-docker).
 
 You can also check [vLLM official documentation](https://docs.vllm.ai/en/latest/serving/multimodal_inputs.html) for more details about online serving and offline inference.
 
@@ -667,7 +667,7 @@ You can also check [vLLM official documentation](https://docs.vllm.ai/en/latest/
 pip install git+https://github.com/huggingface/transformers@f3f6c86582611976e72be054675e2bf0abb5f775
 pip install accelerate
 pip install qwen-vl-utils
-pip install 'vllm>=0.7.2'
+pip install 'vllm>0.7.2'
 
 ```
 ### Start an OpenAI API Service
@@ -769,7 +769,6 @@ For videos, you can use the chat API  as follows：
 ```python
 import base64
 import numpy as np
-
 from PIL import Image
 from io import BytesIO
 from openai import OpenAI
@@ -793,7 +792,8 @@ video_messages = [
         {
             "type": "video",
             "video": "https://duguang-labelling.oss-cn-shanghai.aliyuncs.com/qiansun/video_ocr/videos/50221078283.mp4",
-            "total_pixels": 20480 * 28 * 28, "min_pixels": 16 * 28 * 2
+            "total_pixels": 20480 * 28 * 28, "min_pixels": 16 * 28 * 2, 
+            'fps': 3.0  # The default value is 2.0, but for demonstration purposes, we set it to 3.0.
         }]
     },
 ]
@@ -801,13 +801,11 @@ video_messages = [
 
 def prepare_message_for_vllm(content_messages):
     """
-    The frame extraction logic of video inside vLLM is different from that of qwen_vl_utils.
-    Here we `use qwen_vl_utils` to extract video frames, and the `media_type` of video is set to `video/jpeg`;
-    Note: Currently vLLM online inference does not support passing `fps` parameters through `mm_processor_kwargs`,
-    so the default value 2.0 is used in  this function;
-    We will fix this problem later, see: https://github.com/vllm-project/vllm/issues/11652
+    The frame extraction logic for videos in `vLLM` differs from that of `qwen_vl_utils`.
+    Here, we utilize `qwen_vl_utils` to extract video frames, with the `media_typ`e of the video explicitly set to `video/jpeg`.
+    By doing so, vLLM will no longer attempt to extract frames from the input base64-encoded images.
     """
-    vllm_messages = []
+    vllm_messages, fps_list = [], []
     for message in content_messages:
         message_content_list = message["content"]
         if not isinstance(message_content_list, list):
@@ -821,7 +819,7 @@ def prepare_message_for_vllm(content_messages):
                 image_inputs, video_inputs, video_kwargs = process_vision_info(video_message, return_video_kwargs=True)
                 assert video_inputs is not None, "video_inputs should not be None"
                 video_input = (video_inputs.pop()).permute(0, 2, 3, 1).numpy().astype(np.uint8)
-                print("video_kwargs", video_kwargs, video_input.shape)
+                fps_list.extend(video_kwargs.get('fps', []))
 
                 # encode image with base64
                 base64_frames = []
@@ -840,13 +838,16 @@ def prepare_message_for_vllm(content_messages):
             new_content_list.append(part_message)
         message["content"] = new_content_list
         vllm_messages.append(message)
-    return vllm_messages
+    return vllm_messages, {'fps': fps_list}
 
 
-video_messages = prepare_message_for_vllm(video_messages)
+video_messages, video_kwargs = prepare_message_for_vllm(video_messages)
 chat_response = client.chat.completions.create(
     model="Qwen/Qwen2.5-VL-7B-Instruct",
-    messages=video_messages
+    messages=video_messages,
+    extra_body={
+        "mm_processor_kwargs": video_kwargs
+    }
 )
 print("Chat response:", chat_response)
 ```

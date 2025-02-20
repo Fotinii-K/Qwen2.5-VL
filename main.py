@@ -39,6 +39,7 @@ plot_bounding_boxes(image,response,input_width,input_height)
 
 
 
+
 # # #### 2. Detect a specific object using descriptions
 # # Further, you can search for a specific object by using a short phrase or sentence to describe it.
 

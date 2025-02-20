@@ -1,0 +1,23 @@
+
+
+connection_type: "id"
+serial_number: 0
+svo_input_filename: "./output/720/apple_3x_banana_720.svo2"
+sender_ip: "127.0.0.1"
+port: 30000
+depth_mode: "ULTRA"
+resolution: "HD720"
+coordinate_units: "MILLIMETER"
+camera_fps: 15
+depth_min_distance: 100
+depth_max_distance: 1000
+enable_fill_mode: false
+
+
+
+  
+
+
+
+
+

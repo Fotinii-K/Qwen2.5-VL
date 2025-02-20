@@ -170,8 +170,8 @@ def parse_json(json_output):
 
 # Load inference function.
 
-def inference(img_url, prompt, system_prompt="You are a helpful assistant", max_new_tokens=1024):
-  image = Image.open(img_url)
+def inference(image, prompt, system_prompt="You are a helpful assistant", max_new_tokens=1024):
+  # image = Image.open(img_url)
   messages = [
     {
       "role": "system",
@@ -185,7 +185,7 @@ def inference(img_url, prompt, system_prompt="You are a helpful assistant", max_
           "text": prompt
         },
         {
-          "image": img_url
+          "image": image
         }
       ]
     }

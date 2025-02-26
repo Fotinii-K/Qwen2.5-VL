@@ -12,10 +12,9 @@ import ast
 # model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-7B-Instruct", torch_dtype="auto", device_map="auto")
 model_path = "Qwen/Qwen2.5-VL-7B-Instruct"
 model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2",device_map="auto")
-processor = AutoProcessor.from_pretrained(model_path)
 
 # Load the processor
-processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-7B-Instruct")
+processor = AutoProcessor.from_pretrained(model_path)
 
 # Function to determine input type based on file extension
 def get_input_type(file_paths):
@@ -39,7 +38,8 @@ def get_input_type(file_paths):
 
 # Function to process bounding box requests
 def bounding_box_request(image_path, prompt):
-    response, input_height, input_width = inference(image_path, prompt)  # Get bounding box coordinates
+    image = Image.open(image_path)
+    response, input_height, input_width = inference(image, prompt)  # Get bounding box coordinates
     image = Image.open(image_path)
     image.thumbnail([640, 640], Image.Resampling.LANCZOS)  # Resize image for visualization
     plot_bounding_boxes(image, response, input_width, input_height)  # Plot bounding boxes
@@ -53,7 +53,7 @@ file_paths = ["/home/nakama6000/Documents/git/Qwen2.5-VL/demo.jpeg"]
 input_type = get_input_type(file_paths)
 
 # Define General Context Message
-message_general_context = """You are working a helpful assistant. """
+message_general_context = """You are a helpful assistant. """
 prompt = """If any animals are identified in the scene create a bounding box around them and output all the coordinates in JSON format."""
 
 # Construct messages based on input type
@@ -142,3 +142,4 @@ def extract_assistant_response(output_text):
 assistant_response = extract_assistant_response(output_text)
 print(f"Response for {input_type}:")
 print(assistant_response)
+

@@ -26,7 +26,8 @@ image_path = "/home/nakama6000/Documents/git/Qwen2.5-VL/cookbooks/assets/spatial
 prompt = "Outline the position of each small cake and output all the coordinates in JSON format."
 
 t_inference_start = time.time()
-response, input_height, input_width = inference(image_path, prompt)
+image_obj=Image.open(image_path)
+response, input_height, input_width = inference(image_obj, prompt)
 t_inference_end = time.time()
 
 print(f"time taken to load = {t_inference_end-t_inference_start}, Associated FPS = {1/(t_inference_end-t_inference_start)}")
@@ -47,12 +48,12 @@ plot_bounding_boxes(image,response,input_width,input_height)
 
 #? 
 # * 
-image_path = "./assets/spatial_understanding/cakes.png"
+# image_path = "./assets/spatial_understanding/cakes.png"
 
-# # prompt in chinses
+# prompt in chinses
 # prompt = "定位最右上角的棕色蛋糕，以JSON格式输出其bbox坐标"
 # prompt in english
-prompt = "Locate the top right brown cake, output its bbox coordinates using JSON format."
+# prompt = "Locate the top right brown cake, output its bbox coordinates using JSON format."
 
 # ## Use a local HuggingFace model to inference.
 # response, input_height, input_width = inference(image_path, prompt)

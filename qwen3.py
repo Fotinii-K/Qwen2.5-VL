@@ -35,7 +35,7 @@ frame_array = []
 # start_time = time.time()
 index = 0
 
-while index<50:
+while index<2:
     if pw.retrieve(is_image=True, is_measure=True):
         left_image = pw.output_image
         if left_image is not None:  # Ensure the frame is valid
@@ -172,7 +172,7 @@ for frame in frame_array:
 # # Move inputs to CUDA
 # inputs = inputs.to("cuda")
 
-# # Generate output
+# # # Generate output
 # generated_ids = model.generate(**inputs, max_new_tokens=10000)
 
 # # Decode the generated output
@@ -180,13 +180,13 @@ for frame in frame_array:
 #     generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False
 # )
 
-# Extract only the assistant's response
-def extract_assistant_response(output_text):
-    assistant_start = output_text[0].find("assistant\n") + len("assistant\n")
-    assistant_response = output_text[0][assistant_start:].strip()
-    return assistant_response
+# # Extract only the assistant's response
+# def extract_assistant_response(output_text):
+#     assistant_start = output_text[0].find("assistant\n") + len("assistant\n")
+#     assistant_response = output_text[0][assistant_start:].strip()
+#     return assistant_response
 
-# Print the response
-assistant_response = extract_assistant_response(output_text)
-# print(f"Response for {input_type}:")
-print(assistant_response)
+# # Print the response
+# assistant_response = extract_assistant_response(output_text)
+# # print(f"Response for {input_type}:")
+# print(assistant_response)

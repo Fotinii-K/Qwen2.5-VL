@@ -80,9 +80,9 @@ def create_image_grid(images, num_columns=8):
     return grid_image
 
 
-def inference(video_path, prompt, max_new_tokens=2048, total_pixels=20480 * 28 * 28, min_pixels=16 * 28 * 28):
+def inference(video_path, system_prompt, prompt, max_new_tokens=2048, total_pixels=20480 * 28 * 28, min_pixels=16 * 28 * 28):
     messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": [
                 {"type": "text", "text": prompt},
                 {"video": video_path, "total_pixels": total_pixels, "min_pixels": min_pixels},

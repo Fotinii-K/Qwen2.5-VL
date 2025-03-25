@@ -46,6 +46,7 @@ We enhance both training and inference speeds by strategically implementing wind
 
 
 ## News
+* 2025.03.25: We have released the [Qwen2.5-VL-32B]([https://huggingface.co/Qwen](https://huggingface.co/Qwen/Qwen2.5-VL-32B-Instruct)). It is smarter and its responses align more closely with human preferences. For more details, please check our [blog](https://qwenlm.github.io/blog/qwen2.5-vl-32b/)!
 * 2025.02.20: we have released the [Qwen2.5-VL Technical Report](https://arxiv.org/abs/2502.13923). Alongside the report, we have also released AWQ-quantized models for Qwen2.5-VL in three different sizes: [3B](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct-AWQ), [7B](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct-AWQ) , and [72B](https://huggingface.co/Qwen/Qwen2.5-VL-72B-Instruct-AWQ) parameters.
 * 2025.01.28: We have released the [Qwen2.5-VL series](https://huggingface.co/Qwen). For more details, please check our [blog](https://qwenlm.github.io/blog/qwen2.5-vl/)!
 * 2024.12.25: We have released the [QvQ-72B-Preview](https://huggingface.co/Qwen/QVQ-72B-Preview). QvQ-72B-Preview is an experimental research model, focusing on enhancing visual reasoning capabilities. For more details, please check our [blog](https://qwenlm.github.io/blog/qvq-72b-preview/)!
@@ -57,29 +58,29 @@ We enhance both training and inference speeds by strategically implementing wind
 
 
 
-| Dataset            | Qwen2.5-VL-3B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-3B-Instruct))     | Qwen2.5-VL-7B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-7B-Instruct))    | Qwen2.5-VL-72B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-72B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-72B-Instruct)) | Gemini-2 Flash | GPT-4o | Claude3.5 Sonnet | Qwen2-VL 72B | 
-|--------------------|--------|--------|----------------|----------------|--------|------------------|--------------|
-| MMMU               | 53.1  | 58.6 |**70.2**           | **70.7**           | 70.3   | 70.4             | 64.5         | 
-| MMMU Pro           | 31.6  | 38.3 |**51.1**           | **57**             | 54.5   | 54.7             | 46.2         | 
-| DocVQA             | 93.9 | 95.7 |**96.4**           | 92.1           | 91.1   | 95.2             | **96.5**         | 
-| InfoVQA            | 77.1 | 82.6 | **87.3**          | 77.8           | 80.7   | 74.3             | 84.5         | 
-| CC-OCR             | 74.5 |  77.8 | **79.8**          | 73.0           | 66.6   | 62.7             | 68.7         | 
-| OCRBenchV2         | 54.3/52.1 | 56.3/57.2 | **61.5/63.7**      | -              | 46.5/32.3 | 45.2/39.6       | 47.8/46.1    | 
-| MegaBench          | 28.9 |36.8 | **51.3**          | **55.2**           | 54.2   | 52.1             | 46.8         | 
-| MMStar             | 55.8|63.9|**70.8**           | 69.4           | 64.7   | 65.1             | 68.3         | 
-| MMBench1.1         |  81.5  | 84.3 |**88.0**           | 83.0           | 82.1   | 83.4             | 86.6         | 
-| MathVista          | 62.3  | 68.2  | **74.8**           | 73.1           | 63.8   | 65.4             | 70.5         | 
-| MathVision         | 21.2  | 25.1 |**38.1**           | **41.3**           | 30.4   | 38.3             | 25.9         | 
-| VideoMME           | 61.5/67.6 | 65.1/71.6 |**73.3/79.1**      | -/-            | 71.9/77.2 | 60/62.9         | 71.2/77.8    | 
-| MMBench-Video      | 1.63           | 1.79    |**2.02**           | -              | 1.68   | 1.38             | 1.7          | 
-| LVBench            | 43.3        | 45.3 |**47.3**           | -              | 30.8   | -                | -            | 
-| CharadesSTA        | 38.8        | 43.6        |**50.9**           | -              | 35.7   | -                | -            | 
-| AITZ               | 76.9|81.9 |**83.2**           | -              | 35.3   | -                | -            | 
-| Android Control    | 63.7/90.8 | 60.1/91.4 |**67.36/93.7**     | -              | -      | -                | 66.4/84.4    | 
-| ScreenSpot         | 55.5|84.7|**87.1**           | 84.0           | 18.1   | 83.0             | -            | 
-| ScreenSpot Pro     | 23.9|29.0 |**43.6**           | -              | -      | 17.1             | -            | 
-| AndroidWorld       | -  | -  |**35**             | -              | 34.5(SoM) | 27.9            | -            | 
-| OSWorld            | -  | -  |**8.83**           | -              | 5.03   | **14.9**             | -            | 
+| Dataset            | Qwen2.5-VL-3B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-3B-Instruct))     | Qwen2.5-VL-7B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-7B-Instruct))    | Qwen2.5-VL-32B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-32B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-32B-Instruct))    | Qwen2.5-VL-72B<br><sup>([🤗](https://huggingface.co/Qwen/Qwen2.5-VL-72B-Instruct)[🤖](https://modelscope.cn/models/qwen/Qwen2.5-VL-72B-Instruct)) | Gemini-2 Flash | GPT-4o | Claude3.5 Sonnet | Qwen2-VL 72B | 
+|--------------------|--------|--------|--------|----------------|----------------|--------|------------------|--------------|
+| MMMU               | 53.1  | 58.6 | 70.0  | **70.2**           | **70.7**           | 70.3   | 70.4             | 64.5         | 
+| MMMU Pro           | 31.6  | 38.3 |49.5|**51.1**           | **57**             | 54.5   | 54.7             | 46.2         | 
+| DocVQA             | 93.9 | 95.7 | 94.8 |**96.4**           | 92.1           | 91.1   | 95.2             | **96.5**         | 
+| InfoVQA            | 77.1 | 82.6 | 83.4| **87.3**          | 77.8           | 80.7   | 74.3             | 84.5         | 
+| CC-OCR             | 74.5 |  77.8 | 77.1 |**79.8**          | 73.0           | 66.6   | 62.7             | 68.7         | 
+| OCRBenchV2         | 54.3/52.1 | 56.3/57.2 | 57.2/59.1| **61.5/63.7**      | -              | 46.5/32.3 | 45.2/39.6       | 47.8/46.1    | 
+| MegaBench          | 28.9 |36.8 | - |**51.3**          | **55.2**           | 54.2   | 52.1             | 46.8         | 
+| MMStar             | 55.8|63.9| 69.5 |**70.8**           | 69.4           | 64.7   | 65.1             | 68.3         | 
+| MMBench1.1         |  81.5  | 84.3 | 84.6|**88.0**           | 83.0           | 82.1   | 83.4             | 86.6         | 
+| MathVista          | 62.3  | 68.2  | 74.7 |**74.8**           | 73.1           | 63.8   | 65.4             | 70.5         | 
+| MathVision         | 21.2  | 25.1 | **38.4** |38.1           | **41.3**           | 30.4   | 38.3             | 25.9         | 
+| VideoMME           | 61.5/67.6 | 65.1/71.6 | 70.5/77.9 |**73.3/79.1**      | -/-            | 71.9/77.2 | 60/62.9         | 71.2/77.8    | 
+| MMBench-Video      | 1.63           | 1.79    | 1.93 |**2.02**           | -              | 1.68   | 1.38             | 1.7          | 
+| LVBench            | 43.3        | 45.3 | **49.0** | 47.3           | -              | 30.8   | -                | -            | 
+| CharadesSTA        | 38.8        | 43.6    |   **54.2** | 50.9           | -              | 35.7   | -                | -            | 
+| AITZ               | 76.9|81.9 | 83.1 |**83.2**           | -              | 35.3   | -                | -            | 
+| Android Control    | 63.7/90.8 | 60.1/91.4 | 69.6/93.3 |**67.36/93.7**     | -              | -      | -                | 66.4/84.4    | 
+| ScreenSpot         | 55.5|84.7| **88.5** | 87.1          | 84.0           | 18.1   | 83.0             | -            | 
+| ScreenSpot Pro     | 23.9|29.0 |  39.4 |**43.6**           | -              | -      | 17.1             | -            | 
+| AndroidWorld       | -  | -  | 22.0 |**35**             | -              | 34.5(SoM) | 27.9            | -            | 
+| OSWorld            | -  | -  | 5.92 |**8.83**           | -              | 5.03   | **14.9**             | -            | 
 
 
 

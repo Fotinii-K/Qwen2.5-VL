@@ -193,16 +193,16 @@ print(output_text)
 ```
 
 <details>
-<summary>Minimum video memory requirements</summary>
+<summary>Minimum VRAM requirements</summary>
 
 | Precision | Qwen2.5-VL-3B | Qwen2.5-VL-7B | Qwen2.5-VL-72B |
-|-----------| ------------- | --------- | -------------- |
-| FP32      | 5.75 GB       | 13.17 GB  | 133.11 GB      |
-| BF16      | 2.87 GB       | 6.59 GB   | 66.55 GB       |
-| INT8      | 1.44 GB       | 3.29 GB   | 33.28 GB       |
-| INT4      | 735.75 MB     | 1.65 GB   | 16.64 GB       |
+|-----------|------------| --------- | -------- |
+| FP32      | 11.5 GB    | 26.34 GB  | 266.21 GB |
+| BF16      | 5.75 GB    | 13.17 GB  | 133.11 GB |
+| INT8      | 2.87 GB    | 6.59 GB   | 66.5 GB |
+| INT4      | 1.44 GB    | 3.29 GB   | 33.28 GB |
 
-Note: The table above presents the theoretical minimum memory requirements for inference with `transformers`; however, in practice, the actual memory usage is typically at least 1.2 times higher. For more information, see the linked resource [here](https://huggingface.co/docs/accelerate/main/en/usage_guides/model_size_estimator).
+Note: The table above presents the theoretical minimum video memory requirements for inference with `transformers`; however, in practice, the actual memory usage is typically at least 1.2 times higher. For more information, see the linked resource [here](https://huggingface.co/docs/accelerate/main/en/usage_guides/model_size_estimator).
 </details>
 
 

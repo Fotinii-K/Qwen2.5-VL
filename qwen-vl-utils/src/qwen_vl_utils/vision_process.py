@@ -343,7 +343,7 @@ def extract_vision_info(conversations: list[dict] | list[list[dict]]) -> list[di
                         "image" in ele
                         or "image_url" in ele
                         or "video" in ele
-                        or ele["type"] in ("image", "image_url", "video")
+                        or ele.get("type","") in ("image", "image_url", "video")
                     ):
                         vision_infos.append(ele)
     return vision_infos

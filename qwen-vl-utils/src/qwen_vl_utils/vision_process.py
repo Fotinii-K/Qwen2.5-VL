@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import copy
 import logging
 import math
 import os
@@ -9,6 +10,7 @@ import time
 import warnings
 from functools import lru_cache
 from io import BytesIO
+from typing import Optional
 
 import requests
 import torch
@@ -17,7 +19,6 @@ from packaging import version
 from PIL import Image
 from torchvision import io, transforms
 from torchvision.transforms import InterpolationMode
-from typing import Optional
 
 
 logger = logging.getLogger(__name__)
@@ -86,12 +87,12 @@ def smart_resize(
 
 
 def to_rgb(pil_image: Image.Image) -> Image.Image:
-      if pil_image.mode == 'RGBA':
-          white_background = Image.new("RGB", pil_image.size, (255, 255, 255))
-          white_background.paste(pil_image, mask=pil_image.split()[3])  # Use alpha channel as mask
-          return white_background
-      else:
-          return pil_image.convert("RGB")
+    if pil_image.mode == 'RGBA':
+        white_background = Image.new("RGB", pil_image.size, (255, 255, 255))
+        white_background.paste(pil_image, mask=pil_image.split()[3])  # Use alpha channel as mask
+        return white_background
+    else:
+        return pil_image.convert("RGB")
 
 
 def fetch_image(ele: dict[str, str | Image.Image], size_factor: int = IMAGE_FACTOR) -> Image.Image:
@@ -103,15 +104,20 @@ def fetch_image(ele: dict[str, str | Image.Image], size_factor: int = IMAGE_FACT
     if isinstance(image, Image.Image):
         image_obj = image
     elif image.startswith("http://") or image.startswith("https://"):
-        response = requests.get(image, stream=True)
-        image_obj = Image.open(BytesIO(response.content))
+        # fix memory leak issue while using BytesIO
+        with requests.get(image, stream=True) as response:
+            response.raise_for_status()
+            with BytesIO(response.content) as bio:
+                image_obj = copy.deepcopy(Image.open(bio))
     elif image.startswith("file://"):
         image_obj = Image.open(image[7:])
     elif image.startswith("data:image"):
         if "base64," in image:
             _, base64_data = image.split("base64,", 1)
             data = base64.b64decode(base64_data)
-            image_obj = Image.open(BytesIO(data))
+            # fix memory leak issue while using BytesIO
+            with BytesIO(data) as bio:
+                image_obj = copy.deepcopy(Image.open(bio))
     else:
         image_obj = Image.open(image)
     if image_obj is None:
@@ -223,6 +229,64 @@ def is_decord_available() -> bool:
     return importlib.util.find_spec("decord") is not None
 
 
+def calculate_video_frame_range(
+    ele: dict,
+    total_frames: int,
+    video_fps: float,
+) -> tuple[int, int, int]:
+    """
+    Calculate the start and end frame indices based on the given time range.
+
+    Args:
+        ele (dict): A dictionary containing optional 'video_start' and 'video_end' keys (in seconds).
+        total_frames (int): Total number of frames in the video.
+        video_fps (float): Frames per second of the video.
+
+    Returns:
+        tuple: A tuple containing (start_frame, end_frame, frame_count).
+
+    Raises:
+        ValueError: If input parameters are invalid or the time range is inconsistent.
+    """
+    # Validate essential parameters
+    if video_fps <= 0:
+        raise ValueError("video_fps must be a positive number")
+    if total_frames <= 0:
+        raise ValueError("total_frames must be a positive integer")
+
+    # Get start and end time in seconds
+    video_start = ele.get("video_start", None)
+    video_end = ele.get("video_end", None)
+    if video_start is None and video_end is None:
+        return 0, total_frames - 1, total_frames
+
+    max_duration = total_frames / video_fps
+    # Process start frame
+    if video_start is not None:
+        video_start_clamped = max(0.0, min(video_start, max_duration))
+        start_frame = math.ceil(video_start_clamped * video_fps)
+    else:
+        start_frame = 0
+    # Process end frame
+    if video_end is not None:
+        video_end_clamped = max(0.0, min(video_end, max_duration))
+        end_frame = math.floor(video_end_clamped * video_fps)
+        end_frame = min(end_frame, total_frames - 1)
+    else:
+        end_frame = total_frames - 1
+
+    # Validate frame order
+    if start_frame >= end_frame:
+        raise ValueError(
+            f"Invalid time range: Start frame {start_frame} (at {video_start_clamped if video_start is not None else 0}s) "
+            f"exceeds end frame {end_frame} (at {video_end_clamped if video_end is not None else max_duration}s). "
+            f"Video duration: {max_duration:.2f}s ({total_frames} frames @ {video_fps}fps)"
+        )
+
+    logger.info(f"calculate video frame range: {start_frame=}, {end_frame=}, {total_frames=} from {video_start=}, {video_end=}, {video_fps=:.3f}")
+    return start_frame, end_frame, end_frame - start_frame + 1
+
+
 def _read_video_decord(
     ele: dict,
 ) -> (torch.Tensor, float):
@@ -241,22 +305,72 @@ def _read_video_decord(
     video_path = ele["video"]
     st = time.time()
     vr = decord.VideoReader(video_path)
-    # TODO: support start_pts and end_pts
-    if 'video_start' in ele or 'video_end' in ele:
-        raise NotImplementedError("not support start_pts and end_pts in decord for now.")
     total_frames, video_fps = len(vr), vr.get_avg_fps()
-    logger.info(f"decord:  {video_path=}, {total_frames=}, {video_fps=}, time={time.time() - st:.3f}s")
+    start_frame, end_frame, total_frames = calculate_video_frame_range(
+        ele,
+        total_frames,
+        video_fps,
+    )
     nframes = smart_nframes(ele, total_frames=total_frames, video_fps=video_fps)
-    idx = torch.linspace(0, total_frames - 1, nframes).round().long().tolist()
+    idx = torch.linspace(start_frame, end_frame, nframes).round().long().tolist()
     video = vr.get_batch(idx).asnumpy()
     video = torch.tensor(video).permute(0, 3, 1, 2)  # Convert to TCHW format
+    logger.info(f"decord:  {video_path=}, {total_frames=}, {video_fps=}, time={time.time() - st:.3f}s")
     sample_fps = nframes / max(total_frames, 1e-6) * video_fps
+    return video, sample_fps
+
+
+def is_torchcodec_available() -> bool:
+    """Check if torchcodec is available and properly installed."""
+    try:
+        import importlib.util
+        if importlib.util.find_spec("torchcodec") is None:
+            return False
+        from torchcodec.decoders import VideoDecoder
+        return True
+    except (ImportError, AttributeError, Exception):
+        return False
+
+
+def _read_video_torchcodec(
+    ele: dict,
+) -> (torch.Tensor, float):
+    """read video using torchcodec.decoders.VideoDecoder
+
+    Args:
+        ele (dict): a dict contains the configuration of video.
+        support keys:
+            - video: the path of video. support "file://", "http://", "https://" and local path.
+            - video_start: the start time of video.
+            - video_end: the end time of video.
+    Returns:
+        torch.Tensor: the video tensor with shape (T, C, H, W).
+    """
+    from torchcodec.decoders import VideoDecoder
+    TORCHCODEC_NUM_THREADS = int(os.environ.get('TORCHCODEC_NUM_THREADS', 8))
+    logger.info(f"set TORCHCODEC_NUM_THREADS: {TORCHCODEC_NUM_THREADS}")
+    video_path = ele["video"]
+    st = time.time()
+    decoder = VideoDecoder(video_path, num_ffmpeg_threads=TORCHCODEC_NUM_THREADS)
+    video_fps = decoder.metadata.average_fps
+    total_frames = decoder.metadata.num_frames
+    start_frame, end_frame, total_frames = calculate_video_frame_range(
+        ele,
+        total_frames,
+        video_fps,
+    )
+    nframes = smart_nframes(ele, total_frames=total_frames, video_fps=video_fps)
+    idx = torch.linspace(start_frame, end_frame, nframes).round().long().tolist()
+    sample_fps = nframes / max(total_frames, 1e-6) * video_fps
+    video = decoder.get_frames_at(indices=idx).data
+    logger.info(f"torchcodec:  {video_path=}, {total_frames=}, {video_fps=}, time={time.time() - st:.3f}s")
     return video, sample_fps
 
 
 VIDEO_READER_BACKENDS = {
     "decord": _read_video_decord,
     "torchvision": _read_video_torchvision,
+    "torchcodec": _read_video_torchcodec,
 }
 
 FORCE_QWENVL_VIDEO_READER = os.getenv("FORCE_QWENVL_VIDEO_READER", None)
@@ -266,6 +380,8 @@ FORCE_QWENVL_VIDEO_READER = os.getenv("FORCE_QWENVL_VIDEO_READER", None)
 def get_video_reader_backend() -> str:
     if FORCE_QWENVL_VIDEO_READER is not None:
         video_reader_backend = FORCE_QWENVL_VIDEO_READER
+    elif is_torchcodec_available():
+        video_reader_backend = "torchcodec"
     elif is_decord_available():
         video_reader_backend = "decord"
     else:

@@ -108,11 +108,15 @@ We offer a toolkit to help you handle various types of visual input more conveni
 pip install qwen-vl-utils[decord]
 ```
 
-If you are not using Linux, you might not be able to install `decord` from PyPI. In that case, you can use `pip install qwen-vl-utils` which will fall back to using torchvision for video processing. However, you can still [install decord from source](https://github.com/dmlc/decord?tab=readme-ov-file#install-from-source) to get decord used when loading video.
+Currently, `qwen-vl-utils` supports three video decoding backends: `torchvision`, `decord`, and `torchcodec`. While `decord` and `torchcodec` generally offer significantly faster decoding speeds compared to `torchvision`, we recommend using `torchcodec`. This is because `decord` has known issues, such as decoding hangs, and its project is no longer actively maintained.
 
-We are preparing [cookbooks](https://github.com/QwenLM/Qwen2.5-VL/tree/main/cookbooks) for many capabilities, including recognition, localization, document parsing, video understanding, key information extraction, and more. Welcome to learn more!
+- For `decord`, if you are not using Linux, you might not be able to install `decord` from PyPI. In that case, you can use `pip install qwen-vl-utils` which will fall back to using torchvision for video processing. However, you can still [install decord from source](https://github.com/dmlc/decord?tab=readme-ov-file#install-from-source) to get decord used when loading video.
+
+- To use `torchcodec` as the backend for video decoding, follow the installation instructions provided in the official [torchcodec repository](https://github.com/pytorch/torchcodec/tree/main?tab=readme-ov-file#installing-torchcodec) and install it manually. Note that `torchcodec` depends on FFmpeg for decoding functionality.
 
 ## Cookbooks
+
+We are preparing [cookbooks](https://github.com/QwenLM/Qwen2.5-VL/tree/main/cookbooks) for many capabilities, including recognition, localization, document parsing, video understanding, key information extraction, and more. Welcome to learn more!
 
 | Cookbook | Description | Open |
 | -------- | ----------- | ---- |
@@ -296,6 +300,9 @@ messages = [
             {
                 "type": "video",
                 "video": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen2-VL/space_woaudio.mp4",
+                "min_pixels": 4 * 28 * 28,
+                "max_pixels": 256 * 28 * 28,
+                "total_pixels": 20480 * 28 * 28,
             },
             {"type": "text", "text": "Describe this video."},
         ],
@@ -329,13 +336,21 @@ output_text = processor.batch_decode(
 print(output_text)
 ```
 
-Video URL compatibility largely depends on the third-party library version. The details are in the table below. change the backend by `FORCE_QWENVL_VIDEO_READER=torchvision` or `FORCE_QWENVL_VIDEO_READER=decord` if you prefer not to use the default one.
+#### Video URL compatibility
+
+Video URL compatibility is primarily determined by the version of the third-party library being used. For more details, refer to the table below. If you prefer not to use the default backend, you can switch it by setting `FORCE_QWENVL_VIDEO_READER` to `torchvision`, `decord`, or `torchcodec`.
 
 | Backend     | HTTP | HTTPS |
 |-------------|------|-------|
 | torchvision >= 0.19.0 | ✅  | ✅   |
 | torchvision < 0.19.0  | ❌  | ❌   |
 | decord      | ✅  | ❌   |
+| torchcodec  | ✅  | ✅   |
+
+#### Configuration for adjusting video resolution
+
+We recommend setting appropriate values for the `min_pixels` and `max_pixels` parameters based on available GPU memory and the specific application scenario to restrict the resolution of individual frames in the video. Alternatively, you can use the `total_pixels` parameter to limit the total number of tokens in the video (it is recommended to set this value below 24576 * 28 * 28 to avoid excessively long input sequences). For more details on parameter usage and processing logic, please refer to the `fetch_video` function in `qwen_vl_utils/vision_process.py`.
+
 </details>
 
 <details>

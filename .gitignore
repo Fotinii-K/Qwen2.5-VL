@@ -11,10 +11,20 @@ wheels/
 
 
 *.mp4
-.png
-.deb
-.jpg
-jpeg
+*.png
+*.deb
+*.jpg
+*.jpeg
+*.whl
+*.svo2
+.cache
+*.avi
+*.zip
+*.txt
+
+install
+log
+
 
 # for folders
 # /cookbooksgit_commands.txt

@@ -12,6 +12,8 @@ from functools import lru_cache
 from io import BytesIO
 from typing import Optional
 
+from typing import Tuple
+
 import requests
 import torch
 import torchvision
@@ -188,7 +190,7 @@ def smart_nframes(
 
 def _read_video_torchvision(
     ele: dict,
-) -> (torch.Tensor, float):
+) -> tuple[torch.Tensor, float]:
     """read video using torchvision.io.read_video
 
     Args:
@@ -289,7 +291,7 @@ def calculate_video_frame_range(
 
 def _read_video_decord(
     ele: dict,
-) -> (torch.Tensor, float):
+) -> tuple[torch.Tensor, float]:
     """read video using decord.VideoReader
 
     Args:
@@ -334,7 +336,7 @@ def is_torchcodec_available() -> bool:
 
 def _read_video_torchcodec(
     ele: dict,
-) -> (torch.Tensor, float):
+) -> tuple[torch.Tensor, float]:
     """read video using torchcodec.decoders.VideoDecoder
 
     Args:

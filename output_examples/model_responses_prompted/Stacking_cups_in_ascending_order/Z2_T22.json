@@ -1,0 +1,4 @@
+{
+    "video_name": "Responses for Z2_T22.avi",
+    "output_text_task_success": "Task Evaluation: Yes\nJustification: The robotic arm successfully stacks the cups in the correct ascending numerical order, with cup 1 at the bottom, cup 2 in the middle, and cup 3 on top. There were no instances of cups being stacked out of order, dropped, or failing to be grasped."
+}

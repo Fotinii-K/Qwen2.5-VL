@@ -1,0 +1,5 @@
+{
+    "video_name": "Responses for Z2_T22.avi",
+    "output_text_task_identification": "Task: The task involves a robotic arm manipulating and stacking cups on top of each other.\n\nGoal: The goal is to stack the cups in a specific order, as indicated by the numbers on the table.\n\nRequirements for goal: The robotic arm must accurately pick up each cup and place it on top of the previously stacked cups. The cups should be stacked in ascending order based on their numbers, which are labeled on the table.",
+    "output_text_task_success": "Task Evaluation: Yes\nJustification: The robotic arm is successfully picking up each cup and placing it on top of the previously stacked cups in ascending order based on their numbers. This indicates that the task is being executed correctly."
+}
